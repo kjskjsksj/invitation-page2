@@ -116,8 +116,52 @@ button {
     opacity: 0;
 }
 
+/* BOTÓN NO */
 #btnNo {
-    transition: left 0.3s, top 0.3s;
+    position: relative;
+    transition: transform 0.25s ease, background 0.3s, color 0.3s, opacity 0.3s;
+}
+
+/* SHAKE SCREEN */
+.shake {
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-8px,4px); }
+    40% { transform: translate(8px,-4px); }
+    60% { transform: translate(-6px,3px); }
+    80% { transform: translate(6px,-3px); }
+    100% { transform: translate(0,0); }
+}
+
+/* POPUP ERROR 404 */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+}
+
+.popup-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    animation: pop 0.3s ease;
+    font-family: Georgia, serif;
+}
+
+@keyframes pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 </style>
@@ -126,6 +170,14 @@ button {
 <body>
 
 <div id="player"></div>
+
+<!-- POPUP ERROR -->
+<div id="popupError" class="popup">
+    <div class="popup-box">
+        <h2>ERROR 404</h2>
+        <p>Opción no válida</p>
+    </div>
+</div>
 
 <div class="envelope" id="envelope" onclick="abrirSobre()">
     <div class="flap"></div>
@@ -139,13 +191,13 @@ button {
         </div>
 
         <div id="p1" class="hidden">
-            <p>Si pudieras elegir una noche sin interrupciones, ¿cómo sería?</p>
+            <p>Si pudieras elegir una noche para salir con una persona, ¿cómo sería?</p>
             <button onclick="next()" class="fadeIn">Buena conversación, sin prisa</button>
             <button onclick="next()" class="fadeIn">Algo espontáneo, sin plan previo</button>
         </div>
 
         <div id="p2" class="hidden">
-            <p>¿Te animarías a descubrir qué podría pasar si salimos juntos?</p>
+            <p>Suponiendo que ya sepas quien soy, ¿Te animarías a descubrir qué podría pasar si salimos juntos?</p>
             <button onclick="acepta()" class="fadeIn">Sí</button>
             <button onclick="rechazar()" class="fadeIn">No</button>
         </div>
@@ -204,7 +256,6 @@ function abrirSobre(){
 
 function start(e){
     e.stopPropagation();
-
     document.getElementById("inicio").classList.add("hidden");
     document.getElementById("p1").classList.remove("hidden");
 }
@@ -218,32 +269,71 @@ function acepta(){
     document.getElementById("p2").classList.add("hidden");
     document.getElementById("p3").classList.remove("hidden");
 
-    if (navigator.vibrate) {
-        navigator.vibrate(50);
-    }
+    if (navigator.vibrate) navigator.vibrate(50);
 }
+
+/* =========================
+   BOTÓN NO HUYE
+   ========================= */
+
+let btnNo = null;
+let followActive = false;
+
+document.addEventListener("mousemove", (e) => {
+    if (!followActive || !btnNo) return;
+
+    const rect = btnNo.getBoundingClientRect();
+
+    const dx = e.clientX - (rect.left + rect.width / 2);
+    const dy = e.clientY - (rect.top + rect.height / 2);
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < 140) {
+        const angle = Math.atan2(dy, dx);
+
+        const moveX = Math.cos(angle + Math.PI) * 90;
+        const moveY = Math.sin(angle + Math.PI) * 90;
+
+        btnNo.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    }
+});
+
+/* =========================
+   RECHAZO CON ERROR 404
+   ========================= */
 
 function rechazar(){
     const btn = document.getElementById("btnNo");
+    btnNo = btn;
 
-    btn.textContent = "Error";
-    btn.style.position = "fixed";
+    followActive = true;
 
-    function mover(){
-        const maxX = window.innerWidth - btn.offsetWidth;
-        const maxY = window.innerHeight - btn.offsetHeight;
+    // popup
+    const popup = document.getElementById("popupError");
+    popup.style.display = "flex";
 
-        const x = Math.random() * maxX;
-        const y = Math.random() * maxY;
+    setTimeout(() => {
+        popup.style.display = "none";
+    }, 1500);
 
-        btn.style.left = x + "px";
-        btn.style.top = y + "px";
-    }
+    // shake screen
+    document.body.classList.add("shake");
 
-    mover();
-    setInterval(mover, 600);
+    setTimeout(() => {
+        document.body.classList.remove("shake");
+    }, 400);
+
+    // feedback botón
+    btn.textContent = "ERROR";
+    btn.style.background = "#ffebee";
+    btn.style.color = "#b71c1c";
+
+    // vibración
+    if (navigator.vibrate) navigator.vibrate(100);
 }
 
+/* FINAL */
 function final(){
     document.getElementById("p3").classList.add("hidden");
     document.getElementById("finalBox").classList.remove("hidden");
@@ -273,10 +363,15 @@ function mostrarBotones(){
     document.getElementById("btnHoy").classList.add("fadeIn");
 
     setTimeout(()=>{
-        document.getElementById("btnNo").classList.add("fadeIn");
+        const btn = document.getElementById("btnNo");
+        btn.classList.add("fadeIn");
+
+        btnNo = btn;
+        followActive = true;
     },500);
 }
 
+/* ENVÍO */
 document.getElementById("formFinal").addEventListener("submit", async function(e){
     e.preventDefault();
 
