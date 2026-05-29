@@ -116,6 +116,10 @@ button {
     opacity: 0;
 }
 
+#btnNo {
+    transition: left 0.3s, top 0.3s;
+}
+
 </style>
 </head>
 
@@ -165,7 +169,7 @@ button {
 
             <p id="estadoEnvio"></p>
 
-            <button id="btnNo" class="option">No aceptar</button>
+            <button id="btnNo" class="option" onclick="rechazar()">No aceptar</button>
         </div>
 
     </div>
@@ -219,13 +223,25 @@ function acepta(){
     }
 }
 
-const frases = ["¿Seguro?", "Pensalo otra vez 😏", "No tan rápido...", "Error 😅"];
-let i = 0;
-
 function rechazar(){
     const btn = document.getElementById("btnNo");
-    btn.textContent = frases[i % frases.length];
-    i++;
+
+    btn.textContent = "Error";
+    btn.style.position = "fixed";
+
+    function mover(){
+        const maxX = window.innerWidth - btn.offsetWidth;
+        const maxY = window.innerHeight - btn.offsetHeight;
+
+        const x = Math.random() * maxX;
+        const y = Math.random() * maxY;
+
+        btn.style.left = x + "px";
+        btn.style.top = y + "px";
+    }
+
+    mover();
+    setInterval(mover, 600);
 }
 
 function final(){
@@ -236,7 +252,7 @@ function final(){
 }
 
 function escribirFinal(){
-    const texto = "Entonces... creo que ya sabes a dónde va esto.\n\nMe gustaría invitarte a una noche diferente.\nSin presión, sin guión...\nSolo vos y yo.\n\n¿Aceptás?";
+    const texto = "Entonces... creo que ya sabes a dónde va esto.\n\nMe gustaría invitarte a una noche diferente.\nSolo vos y yo.\n\n¿Aceptás?";
     let i = 0;
     let box = document.getElementById("textoFinal");
 
