@@ -141,8 +141,8 @@ button {
 
         <!-- INICIO -->
         <div id="inicio">
-            <h2>Para ti</h2>
-            <p>No es una invitación común.<br>Es algo breve… pero con intención.</p>
+            <h2>Para TN</h2>
+            <p>No es una invitación común.<br></p>
             <button class="primary fadeIn" onclick="start(event)">Abrir</button>
         </div>
 
@@ -155,14 +155,14 @@ button {
 
         <!-- P2 -->
         <div id="p2" class="hidden">
-            <p>¿Te gustaría salir conmigo?</p>
+            <p>Teniendo en cuenta lo anterior y suponiendo ya que ya sepas quien soy, ¿Te gustaría salir conmigo?</p>
             <button onclick="acepta()" class="fadeIn">Sí</button>
             <button onclick="rechazar()" class="fadeIn">No</button>
         </div>
 
         <!-- P3 -->
         <div id="p3" class="hidden">
-            <p>¿Te gustaría que nuestra cena sea...?</p>
+            <p>¿Cómo te gustaria que sea...?</p>
             <button onclick="final()" class="fadeIn">Planeada</button>
             <button onclick="final()" class="fadeIn">Improvisada</button>
         </div>
